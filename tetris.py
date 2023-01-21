@@ -54,6 +54,20 @@ class Grid():
         self.height = height
         self.grid = [[False for _ in range(self.width)] for _ in range(self.height)]
     
+    def get_row_width(self, row_idx):
+        return sum(self.grid[row_idx])
+    
+    def get_column_height(self, col_idx):
+        for row_idx in range(self.height - 1, -1, -1):
+            if self.grid[row_idx][col_idx]:
+                return self.height - row_idx # TODO check if this is off-by-one
+    
+    #def get_max_height(self):
+    #    return max(
+    #        self.get_column_height(col_idx)
+    #        for col_idx in range(self.width)
+    #    )
+
     def get(self, x, y):
         return self.grid[x][y]
 
@@ -67,11 +81,15 @@ class Grid():
             for _ in range(n_empty_rows)
         ] + nonempty_rows
 
+    # (x, y) bottom left corner of piece
+    #def drop(self, piece, x, y):
+    #    pass
+
 class Game():
     def __init__(self):
         self.WIDTH = 10
-        self.HEIGHT = 10
-        self.DROP_INTERVAL = 100
+        self.HEIGHT = 15
+        self.DROP_INTERVAL = 50
 
         self.step = 0
         self.grid = Grid(self.WIDTH, self.HEIGHT)
@@ -109,9 +127,9 @@ class Game():
         move = self.get_move()
         if move == 'up':
             self.piece.rotate()
-        if move == 'left':
+        if move == 'left' and self.col > 0:
             self.col -= 1
-        if move == 'right':
+        if move == 'right' and self.col + self.piece.get_width() < self.WIDTH:
             self.col += 1
 
         if self.step % self.DROP_INTERVAL == 0:
@@ -139,7 +157,7 @@ class Game():
         print(t_ms)
         for row in grid:
             s = ['x' if filled else '.' for filled in row]
-            print(''.join(s))
+            print(' '.join(s))
         
     def collides(self):
         for (drow, dcol) in self.piece.body:
