@@ -11,12 +11,6 @@ class Piece():
         self.bodies = bodies
         self.body = self.bodies[self.rot_idx]
 
-    #def get_bottom(self):
-    #    bottom = [float('inf') for _ in self.body]
-    #    for (x, y) in self.body:
-    #        bottom[x] = min(y)
-    #    return bottom
-
     def get_weight(self):
         return max(tup[1] for tup in self.body) - min(tup[1] for tup in self.body)
 
@@ -60,20 +54,6 @@ class Grid():
         self.height = height
         self.grid = [[False for _ in range(self.width)] for _ in range(self.height)]
     
-    def get_row_width(self, row_idx):
-        return sum(self.grid[row_idx])
-    
-    def get_column_height(self, col_idx):
-        for row_idx in range(self.height - 1, -1, -1):
-            if self.grid[row_idx][col_idx]:
-                return self.height - row_idx # TODO check if this is off-by-one
-    
-    def get_max_height(self):
-        return max(
-            self.get_column_height(col_idx)
-            for col_idx in range(self.width)
-        )
-
     def get(self, x, y):
         return self.grid[x][y]
 
@@ -86,10 +66,6 @@ class Grid():
             [False for _ in range(self.width)]
             for _ in range(n_empty_rows)
         ] + nonempty_rows
-
-    # (x, y) bottom left corner of piece
-    #def drop(self, piece, x, y):
-    #    pass
 
 class Game():
     def __init__(self):
