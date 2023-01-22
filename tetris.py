@@ -11,11 +11,11 @@ class Piece():
         self.bodies = bodies
         self.body = self.bodies[self.rot_idx]
 
-    def get_weight(self):
+    def get_height(self):
         return max(tup[1] for tup in self.body) - min(tup[1] for tup in self.body)
 
     def get_width(self):
-        return max(tup[0] for tup in self.body) - min(tup[0] for tup in self.body)
+        return max(tup[0] for tup in self.body) + 1# - min(tup[0] for tup in self.body)
 
     def rotate(self):
         self.rot_idx = (self.rot_idx + 1) % len(self.bodies)
@@ -116,6 +116,7 @@ class Game():
             "\033[B": 'down',
             "\033[D": 'left',
             "\033[C": 'right',
+            '': 'drop',
         }
         while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
             line = sys.stdin.readline()
@@ -127,10 +128,13 @@ class Game():
         move = self.get_move()
         if move == 'up':
             self.piece.rotate()
-        if move == 'left' and self.col > 0:
+        elif move == 'left' and self.col > 0:
             self.col -= 1
-        if move == 'right' and self.col + self.piece.get_width() < self.WIDTH:
+        elif move == 'right' and self.col + self.piece.get_width() < self.WIDTH:
             self.col += 1
+        elif move == 'drop':
+            while not self.collides():
+                self.row += 1
 
         if self.step % self.DROP_INTERVAL == 0:
             self.step = 0
@@ -144,6 +148,11 @@ class Game():
                 self.row += 1
         self.step += 1
 
+        # end game condition
+        if sum(self.grid.grid[0]) > 0:
+            return False
+        return True
+
     def render(self):
         os.system('clear')
         grid = [row[:] for row in self.grid.grid]
@@ -151,10 +160,9 @@ class Game():
             row = self.row + drow
             col = self.col + dcol
             grid[row][col] = True
-            print(row, col)
 
         t_ms = int((datetime.now() - self.t_start).seconds)
-        print(t_ms)
+        print("Time: ", t_ms)
         for row in grid:
             s = ['x' if filled else '.' for filled in row]
             print(' '.join(s))
@@ -170,5 +178,7 @@ class Game():
 if __name__ == '__main__':
     game = Game()
     while True:
-        game.update()
-        game.render()
+        if not game.update():
+            sys.exit(0)
+        else:
+            game.render()
