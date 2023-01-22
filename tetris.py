@@ -5,6 +5,7 @@ import random
 import select
 import sys
 
+
 class Piece():
     def __init__(self, bodies):
         self.rot_idx = 0
@@ -60,14 +61,8 @@ class Grid():
     def get_column_height(self, col_idx):
         for row_idx in range(self.height - 1, -1, -1):
             if self.grid[row_idx][col_idx]:
-                return self.height - row_idx # TODO check if this is off-by-one
+                return self.height - row_idx
     
-    #def get_max_height(self):
-    #    return max(
-    #        self.get_column_height(col_idx)
-    #        for col_idx in range(self.width)
-    #    )
-
     def get(self, x, y):
         return self.grid[x][y]
 
@@ -81,9 +76,6 @@ class Grid():
             for _ in range(n_empty_rows)
         ] + nonempty_rows
 
-    # (x, y) bottom left corner of piece
-    #def drop(self, piece, x, y):
-    #    pass
 
 class Game():
     def __init__(self):
@@ -130,7 +122,7 @@ class Game():
             self.piece.rotate()
         elif move == 'left' and self.col > 0:
             self.col -= 1
-        elif move == 'right' and self.col + self.piece.get_width() < self.WIDTH:
+        elif move == 'right' and self.col + self.piece.get_width() - 1 < self.WIDTH:
             self.col += 1
         elif move == 'drop':
             while not self.collides():
@@ -174,6 +166,7 @@ class Game():
             if row + 1 == self.HEIGHT or self.grid.get(row + 1, col):
                 return True
         return False
+
 
 if __name__ == '__main__':
     game = Game()
